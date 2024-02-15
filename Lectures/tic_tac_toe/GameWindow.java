@@ -58,5 +58,8 @@ public class GameWindow extends JFrame {
         setVisible(true);
 //        settings.setVisible(true);
     }
-    
+
+    void startNewGame(int mode, int fSzX, int fSzY, int wLen){
+        map.startNewGame(mode, fSzX, fSzY, wLen);
+    }
 }

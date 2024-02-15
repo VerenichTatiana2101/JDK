@@ -1,6 +1,8 @@
 package JDK.Lectures.tic_tac_toe;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 // стартовое окно
 public class SettingsWindow extends JFrame {
@@ -16,6 +18,13 @@ public class SettingsWindow extends JFrame {
         // добавляем параметры окну
         setLocationRelativeTo(gameWindow);
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        btnStart.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                gameWindow.startNewGame(0, 3, 3, 3);
+                setVisible(false);
+            }
+        });
         // дбавление компонета
         add(btnStart);
     }
