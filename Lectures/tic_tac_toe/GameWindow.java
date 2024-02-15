@@ -5,61 +5,63 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-//основное окно
 public class GameWindow extends JFrame {
-    //высота окна
-    private static  final  int WINDOW_HEIGHT = 555;
-    // ширина окна
-    private static  final  int WINDOW_WIDTH = 507;
-    // положение окна по оси Х
-    private static  final  int WINDOW_POSX = 800;
-    // положение окна по оси У
-    private static  final  int WINDOW_POSY = 300;
-    //добавим кнопку старт
-    JButton btnStart = new JButton("New Game");
-    //кнопка закрыть
-    JButton btnExit = new JButton("Exit");
+    private static final int WIDTH = 555;
+    private static final int HEIGHT = 507;
+
+    JButton btnStart, btnExit;
+    SettingsWindow settingWindow;
     Map map;
-    SettingsWindow settings;
 
     GameWindow(){
-        // для того, чтобы при нажатии на крестик
-        // программа завершала свою работу
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        // добавляем параметры окну
-        setLocation(WINDOW_POSX, WINDOW_POSY);
-        setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-        // добавим название
-        setTitle("Tic-Tac-Toe");
-        // запрещаем пользователю менять размер
-        // чтобы ничего не поломалось
+        // чтобы при закрытии окна закрывалось приложение
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // устанавливаем размер
+        setSize(WIDTH, HEIGHT);
+        // объект не располагается относительно чего-либо, появляется по центру
+        setLocationRelativeTo(null);
+        // название в шапке окна
+        setTitle("TicTacToe");
+        // не даёт пользователю менять размер, чтобы не сломать расположение элементов
         setResizable(false);
+
+        // кнопки
+        btnStart = new JButton("New Game");
+        btnExit = new JButton("Exit");
+        // подключаем всплывающее окно
+        settingWindow = new SettingsWindow(this);
         map = new Map();
-        settings = new SettingsWindow(this);
+
+        // в кнопке выхода делаем просто exit
         btnExit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
             }
         });
+
+        // при нажатии включаем видимость всплывающего окна
         btnStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                settings.setVisible(true);
+                settingWindow.setVisible(true);
             }
         });
 
-        //добавляем кнопки в окно
-        JPanel panButton = new JPanel(new GridLayout(1, 2));
-        panButton.add(btnStart);
-        panButton.add(btnExit);
-        add(panButton, BorderLayout.SOUTH);
+        // располыгаем кнопки относительно нашего окна в блоке из двух колонок одной строки грида
+        JPanel panBottom = new JPanel(new GridLayout(1, 2));
+        panBottom.add(btnStart);
+        panBottom.add(btnExit);
+
+        // используем BorderLayout нижнюю часть экрана
+        add(panBottom, BorderLayout.SOUTH);
         add(map);
+        // делаем объект видимым, тк изначально он невидим
         setVisible(true);
-//        settings.setVisible(true);
     }
 
-    void startNewGame(int mode, int fSzX, int fSzY, int wLen){
-        map.startNewGame(mode, fSzX, fSzY, wLen);
+    // метод старт гейм который вызывается из окна настроек и передаёт нам данные 0,3,3,3 и далее передаём из в мар
+    void startNewGame(int mode, int sizeX, int sizeY, int winLen){
+        map.startNewGame(mode, sizeX, sizeY, winLen);
     }
 }

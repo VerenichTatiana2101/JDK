@@ -4,28 +4,34 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-// стартовое окно
+// создаём окно, которое будет всплывать поверх основного для начала новой игры
 public class SettingsWindow extends JFrame {
-    //высота окна
-    private static  final  int WINDOW_HEIGHT = 230;
-    // ширина окна
-    private static  final  int WINDOW_WIDTH = 350;
+    private static final int WIDTH = 230;
+    private static final int HEIGHT = 250;
 
-    JButton btnStart = new JButton("Start New Game");
+    JButton btnStart;
 
-    // нужно основное окно чтобы отцентрировать стартовое относительно основного
     SettingsWindow(GameWindow gameWindow){
-        // добавляем параметры окну
+        // создаём кнопку
+        btnStart = new JButton("Start new game");
+
+        // настраиваем второе окно относительно первого указывая положение
         setLocationRelativeTo(gameWindow);
-        setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        setLocation(getX() - WIDTH/2, getY() - HEIGHT/2); // настраиваем экран посередине
+        setSize(WIDTH, HEIGHT);
+
+        // единственная кнопка начала игры
         btnStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                gameWindow.startNewGame(0, 3, 3, 3);
+                // слушатель делает окно невидимым
+                //открывается при нажатии старт
                 setVisible(false);
+                // вызывается метод начала игры с размерами поля
+                gameWindow.startNewGame(0, 3, 3, 3);
             }
         });
-        // дбавление компонета
+        // добавляет кнопку на окно
         add(btnStart);
     }
 }
