@@ -22,6 +22,10 @@ public class ViewGuiClient extends JFrame {
         this.client = client;
     }
 
+    protected void initFrClient(){
+
+    }
+
     //метод, инициализирующий графический интерфейс клиентского приложения
     protected void initFrameClient() {
         messages.setEditable(false);
@@ -71,7 +75,7 @@ public class ViewGuiClient extends JFrame {
         messages.append(text);
     }
 
-    //метод обновляющий списо имен подлючившихся пользователей
+    //метод обновляющий список имен подключившихся пользователей
     protected void refreshListUsers(Set<String> listUsers) {
         users.setText("");
         if (client.isConnect()) {
@@ -107,14 +111,14 @@ public class ViewGuiClient extends JFrame {
                 return Integer.parseInt(port.trim());
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(
-                        frame, "Введен неккоректный порт сервера. Попробуйте еще раз.",
+                        frame, "Введен некорректный порт сервера. Попробуйте еще раз.",
                         "Ошибка ввода порта сервера", JOptionPane.ERROR_MESSAGE
                 );
             }
         }
     }
 
-    //вызывает окна для ввода имени пользователя
+    //вызывает окно для ввода имени пользователя
     protected String getNameUser() {
         return JOptionPane.showInputDialog(
                 frame, "Введите имя пользователя:",
@@ -131,3 +135,4 @@ public class ViewGuiClient extends JFrame {
         );
     }
 }
+

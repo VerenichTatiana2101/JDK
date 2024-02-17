@@ -12,7 +12,7 @@ public class Client {
     private Connection connection;
     private static ModelGuiClient model;
     private static ViewGuiClient gui;
-    private volatile boolean isConnect = false; //флаг отобаржающий состояние подключения клиента  серверу
+    private volatile boolean isConnect = false; //состояние подключения клиента к серверу
 
     public boolean isConnect() {
         return isConnect;
@@ -37,9 +37,8 @@ public class Client {
         }
     }
 
-    //метод подключения клиента  серверу
+    //подключение клиента к серверу
     protected void connectToServer() {
-        //если клиент не подключен  сервере то..
         if (!isConnect) {
             while (true) {
                 try {
@@ -70,7 +69,7 @@ public class Client {
                     String nameUser = gui.getNameUser();
                     connection.send(new Message(MessageType.USER_NAME, nameUser));
                 }
-                //если сообщение - имя уже используется, выводим соответствующее оуно с ошибой, повторяем ввод имени
+                //если сообщение - имя уже используется, выводим соответствующее окно с ошибкой, повторяем ввод имени
                 if (message.getTypeMessage() == MessageType.NAME_USED) {
                     gui.errorDialogWindow("Данное имя уже используется, введите другое");
                     String nameUser = gui.getNameUser();
@@ -102,7 +101,7 @@ public class Client {
         try {
             connection.send(new Message(MessageType.TEXT_MESSAGE, text));
         } catch (Exception e) {
-            gui.errorDialogWindow("Ошибка при отправки сообщения");
+            gui.errorDialogWindow("Ошибка при отправке сообщения");
         }
     }
 
@@ -128,7 +127,7 @@ public class Client {
                     gui.addMessage(String.format("Сервисное сообщение: пользователь %s покинул чат.\n", message.getTextMessage()));
                 }
             } catch (Exception e) {
-                gui.errorDialogWindow("Ошибка при приеме сообщения от сервера.");
+                gui.errorDialogWindow("Ошибка при приёме сообщения от сервера.");
                 setConnect(false);
                 gui.refreshListUsers(model.getUsers());
                 break;

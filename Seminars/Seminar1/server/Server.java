@@ -74,8 +74,8 @@ public class Server {
         model = new ModelGuiServer();
         gui.initFrameServer();
         //цикл снизу ждет true от флага isServerStart (при старте сервера в методе startServer устанавливается в true)
-        //после чего запускается бесконечный цикл принятия подключения от клиента в  методе acceptServer
-        //до тех пор пока сервер не остановится, либо не возникнет исключение
+        //после чего запускается бесконечный цикл принятия подключения от клиента в методе acceptServer
+        //до тех пор, пока сервер не остановится, либо не возникнет исключение
         while (true) {
             if (isServerStart) {
                 server.acceptServer();
@@ -84,8 +84,8 @@ public class Server {
         }
     }
 
-    //класс-поток, который запускается при принятии сервером нового сокетного соединения с клиентом, в конструктор
-    //передается объект класса Socket
+    //класс-поток, который запускается при принятии сервером нового socket соединения с клиентом,
+    // в конструктор передается объект класса Socket
     private class ServerThread extends Thread {
         private Socket socket;
 
@@ -93,7 +93,7 @@ public class Server {
             this.socket = socket;
         }
 
-        //метод который реализует запрос сервера у клиента имени и добавлении имени в мапу
+        //метод, который реализует запрос сервера у клиента имени и добавлении имени в map
         private String requestAndAddingUser(Connection connection) {
             while (true) {
                 try {
@@ -103,13 +103,13 @@ public class Server {
                     String userName = responseMessage.getTextMessage();
                     //получили ответ с именем и проверяем не занято ли это имя другим клиентом
                     if (responseMessage.getTypeMessage() == MessageType.USER_NAME && userName != null && !userName.isEmpty() && !model.getAllUsersMultiChat().containsKey(userName)) {
-                        //добавляем имя в мапу
+                        //добавляем имя в map
                         model.addUser(userName, connection);
                         Set<String> listUsers = new HashSet<>();
                         for (Map.Entry<String, Connection> users : model.getAllUsersMultiChat().entrySet()) {
                             listUsers.add(users.getKey());
                         }
-                        //отправляем клиенту множетство имен всех уже подключившихся пользователей
+                        //отправляем клиенту множество имён всех уже подключившихся пользователей
                         connection.send(new Message(MessageType.NAME_ACCEPTED, listUsers));
                         //отправляем всем клиентам сообщение о новом пользователе
                         sendMessageAllUsers(new Message(MessageType.USER_ADDED, userName));
@@ -134,7 +134,7 @@ public class Server {
                         sendMessageAllUsers(new Message(MessageType.TEXT_MESSAGE, textMessage));
                     }
                     //если тип сообщения DISABLE_USER, то рассылаем всем пользователям, что данный пользователь покинул чат,
-                    //удаляем его из мапы, закрываем его connection
+                    //удаляем его из map, закрываем его соединение
                     if (message.getTypeMessage() == MessageType.DISABLE_USER) {
                         sendMessageAllUsers(new Message(MessageType.REMOVED_USER, userName));
                         model.removeUser(userName);
@@ -153,7 +153,8 @@ public class Server {
         public void run() {
             gui.refreshDialogWindowServer(String.format("Подключился новый пользователь с удаленным сокетом - %s.\n", socket.getRemoteSocketAddress()));
             try {
-                //получаем connection при помощи принятого сокета от клиента и запрашиваем имя, регистрируем, запускаем
+                //получаем соединение при помощи принятого socket от клиента
+                //запрашиваем имя, регистрируем, запускаем
                 //цикл обмена сообщениями между пользователями
                 Connection connection = new Connection(socket);
                 String nameUser = requestAndAddingUser(connection);

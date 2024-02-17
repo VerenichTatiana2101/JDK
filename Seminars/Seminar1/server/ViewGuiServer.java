@@ -55,7 +55,7 @@ public class ViewGuiServer extends JFrame {
         });
     }
 
-    //метод который добавляет в текстовое окно новое сообщение
+    //метод, который добавляет в текстовое окно новое сообщение
     public void refreshDialogWindowServer(String serviceMessage) {
         dialogWindow.append(serviceMessage);
     }
@@ -72,7 +72,7 @@ public class ViewGuiServer extends JFrame {
                 return Integer.parseInt(port.trim());
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(
-                        frame, "Введен неккоректный порт сервера. Попробуйте еще раз.",
+                        frame, "Введен некорректный порт сервера. Попробуйте еще раз.",
                         "Ошибка ввода порта сервера", JOptionPane.ERROR_MESSAGE
                 );
             }

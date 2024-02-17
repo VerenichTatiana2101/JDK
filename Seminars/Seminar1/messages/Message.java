@@ -6,7 +6,7 @@ import java.util.Set;
 public class Message implements Serializable {
     private MessageType typeMessage; //тип сообщения
     private String textMessage; //текст сообщения
-    private Set<String> listUsers; //множество имен уже подлючившихся пользователей
+    private Set<String> listUsers; //множество имен уже подключившихся пользователей
 
     public Message(MessageType typeMessage, String textMessage) {
         this.textMessage = textMessage;
