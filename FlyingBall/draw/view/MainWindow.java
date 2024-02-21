@@ -78,7 +78,7 @@ public class MainWindow extends JFrame implements CanvasRepaintListener, Thread.
     @Override
     public void uncaughtException(Thread t, Throwable e) {
         if (e instanceof BallsOverflowException){
-            e.fillInStackTrace();
+            e.printStackTrace();
         }
     }
 }
