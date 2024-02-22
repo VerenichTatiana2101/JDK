@@ -1,5 +1,7 @@
 package src.client;
 
+import client.ViewGuiClient;
+import server.ViewGuiServer;
 import src.server.Server;
 
 public class Client {
@@ -8,10 +10,10 @@ public class Client {
     private ClientView clientView;
     private Server server;
 
-    public Client(ClientView clientView, Server server) {
+    public Client(ClientView clientView) {
         this.clientView = clientView;
-        this.server = server;
     }
+
 
     public boolean connectToServer(String name) {
         this.name = name;

@@ -88,6 +88,8 @@ public class ClientGui extends JFrame implements ClientView {
         return headerPanel;
     }
 
+
+
     private Component createLog() {
         log = new JTextArea();
         log.setEditable(false);

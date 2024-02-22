@@ -11,7 +11,9 @@ import java.net.Socket;
 public class Client {
     private Connection connection;
     private static ModelGuiClient model;
-    private static ViewGuiClient gui;
+    private IClient iClient;
+    // нужно избавиться
+   // private static ViewGuiClient gui;
     private volatile boolean isConnect = false; //состояние подключения клиента к серверу
 
     public boolean isConnect() {
@@ -22,11 +24,15 @@ public class Client {
         isConnect = connect;
     }
 
+    public Client() {
+        this.iClient = iClient;
+    }
+
     //точка входа в клиентское приложение
     public static void main(String[] args) {
         Client client = new Client();
         model = new ModelGuiClient();
-        gui = new ViewGuiClient(client);
+        ViewGuiClient gui = new ViewGuiClient();
         gui.initFrameClient();
         while (true) {
             if (client.isConnect()) {
@@ -35,7 +41,10 @@ public class Client {
                 client.setConnect(false);
             }
         }
+
+
     }
+
 
     //подключение клиента к серверу
     protected void connectToServer() {
@@ -43,20 +52,20 @@ public class Client {
             while (true) {
                 try {
                     //вызываем окна ввода адреса, порта сервера
-                    String addressServer = gui.getServerAddressFromOptionPane();
-                    int port = gui.getPortServerFromOptionPane();
+                    String addressServer = iClient.getServerAddressFromOptionPane();
+                    int port = iClient.getPortServerFromOptionPane();
                     //создаем сокет и объект connection
                     Socket socket = new Socket(addressServer, port);
                     connection = new Connection(socket);
                     isConnect = true;
-                    gui.addMessage("Сервисное сообщение: Вы подключились к серверу.\n");
+                    iClient.addMessage("Сервисное сообщение: Вы подключились к серверу.\n");
                     break;
                 } catch (Exception e) {
-                    gui.errorDialogWindow("Произошла ошибка! Возможно Вы ввели не верный адрес сервера или порт. Попробуйте еще раз");
+                    errorDialogWindow("Произошла ошибка! Возможно Вы ввели не верный адрес сервера или порт. Попробуйте еще раз");
                     break;
                 }
             }
-        } else gui.errorDialogWindow("Вы уже подключены!");
+        } else errorDialogWindow("Вы уже подключены!");
     }
 
     //метод, реализующий регистрацию имени пользователя со стороны клиентского приложения
@@ -66,30 +75,30 @@ public class Client {
                 Message message = connection.receive();
                 //приняли от сервера сообщение, если это запрос имени, то вызываем окна ввода имени, отправляем на сервер имя
                 if (message.getTypeMessage() == MessageType.REQUEST_NAME_USER) {
-                    String nameUser = gui.getNameUser();
+                    String nameUser = iClient.getNameUser();
                     connection.send(new Message(MessageType.USER_NAME, nameUser));
                 }
                 //если сообщение - имя уже используется, выводим соответствующее окно с ошибкой, повторяем ввод имени
                 if (message.getTypeMessage() == MessageType.NAME_USED) {
-                    gui.errorDialogWindow("Данное имя уже используется, введите другое");
-                    String nameUser = gui.getNameUser();
+                    errorDialogWindow("Данное имя уже используется, введите другое");
+                    String nameUser = iClient.getNameUser();
                     connection.send(new Message(MessageType.USER_NAME, nameUser));
                 }
                 //если имя принято, получаем множество всех подключившихся пользователей, выходим из цикла
                 if (message.getTypeMessage() == MessageType.NAME_ACCEPTED) {
-                    gui.addMessage("Сервисное сообщение: ваше имя принято!\n");
+                    iClient.addMessage("Сервисное сообщение: ваше имя принято!\n");
                     model.setUsers(message.getListUsers());
                     break;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                gui.errorDialogWindow("Произошла ошибка при регистрации имени. Попробуйте переподключиться");
+                errorDialogWindow("Произошла ошибка при регистрации имени. Попробуйте переподключиться");
                 try {
                     connection.close();
                     isConnect = false;
                     break;
                 } catch (IOException ex) {
-                    gui.errorDialogWindow("Ошибка при закрытии соединения");
+                    errorDialogWindow("Ошибка при закрытии соединения");
                 }
             }
 
@@ -101,51 +110,57 @@ public class Client {
         try {
             connection.send(new Message(MessageType.TEXT_MESSAGE, text));
         } catch (Exception e) {
-            gui.errorDialogWindow("Ошибка при отправке сообщения");
+            errorDialogWindow("Ошибка при отправке сообщения");
         }
     }
 
-    //метод принимающий с сервера собщение от других клиентов
+    //метод принимающий с сервера сообщение от других клиентов
     protected void receiveMessageFromServer() {
         while (isConnect) {
             try {
                 Message message = connection.receive();
                 //если тип TEXT_MESSAGE, то добавляем текст сообщения в окно переписки
                 if (message.getTypeMessage() == MessageType.TEXT_MESSAGE) {
-                    gui.addMessage(message.getTextMessage());
+                    iClient.addMessage(message.getTextMessage());
                 }
                 //если сообщение с типо USER_ADDED добавляем сообщение в окно переписки о новом пользователе
                 if (message.getTypeMessage() == MessageType.USER_ADDED) {
                     model.addUser(message.getTextMessage());
-                    gui.refreshListUsers(model.getUsers());
-                    gui.addMessage(String.format("Сервисное сообщение: пользователь %s присоединился к чату.\n", message.getTextMessage()));
+                    iClient.refreshListUsers(model.getUsers());
+                    iClient.addMessage(String.format("Сервисное сообщение: пользователь %s присоединился к чату.\n", message.getTextMessage()));
                 }
                 //аналогично для отключения других пользователей
                 if (message.getTypeMessage() == MessageType.REMOVED_USER) {
                     model.removeUser(message.getTextMessage());
-                    gui.refreshListUsers(model.getUsers());
-                    gui.addMessage(String.format("Сервисное сообщение: пользователь %s покинул чат.\n", message.getTextMessage()));
+                    iClient.refreshListUsers(model.getUsers());
+                    iClient.addMessage(String.format("Сервисное сообщение: пользователь %s покинул чат.\n", message.getTextMessage()));
                 }
             } catch (Exception e) {
-                gui.errorDialogWindow("Ошибка при приёме сообщения от сервера.");
+                errorDialogWindow("Ошибка при приёме сообщения от сервера.");
                 setConnect(false);
-                gui.refreshListUsers(model.getUsers());
+                iClient.refreshListUsers(model.getUsers());
                 break;
             }
         }
     }
 
     //метод реализующий отключение нашего клиента от чата
-    protected void disableClient() {
+    public void disableClient() {
         try {
             if (isConnect) {
                 connection.send(new Message(MessageType.DISABLE_USER));
                 model.getUsers().clear();
                 isConnect = false;
-                gui.refreshListUsers(model.getUsers());
-            } else gui.errorDialogWindow("Вы уже отключены.");
+                iClient.refreshListUsers(model.getUsers());
+            } else errorDialogWindow("Вы уже отключены.");
         } catch (Exception e) {
-            gui.errorDialogWindow("Сервисное сообщение: произошла ошибка при отключении.");
+            errorDialogWindow("Сервисное сообщение: произошла ошибка при отключении.");
         }
     }
+
+    // метод позволяет показывать изображение
+    private void errorDialogWindow(String text) {
+        iClient.showOnWindow(text + "\n");
+    }
+
 }

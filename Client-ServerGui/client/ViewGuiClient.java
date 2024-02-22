@@ -1,5 +1,9 @@
 package client;
 
+import server.ViewGuiServer;
+import src.client.Client;
+import src.client.ClientView;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -9,7 +13,7 @@ import java.awt.event.WindowEvent;
 import java.util.Set;
 
 public class ViewGuiClient extends JFrame {
-    private final Client client;
+    private Client client;
     private JFrame frame = new JFrame("Чат");
     private JTextArea messages = new JTextArea(30, 20);
     private JTextArea users = new JTextArea(30, 15);
@@ -18,12 +22,10 @@ public class ViewGuiClient extends JFrame {
     private JButton buttonDisable = new JButton("Отключиться");
     private JButton buttonConnect = new JButton("Подключиться");
 
-    public ViewGuiClient(Client client) {
-        this.client = client;
-    }
-
-    protected void initFrClient(){
-
+    public ViewGuiClient() {
+        initFrameClient();
+        setVisible(true);
+        //this.client = client;
     }
 
     //метод, инициализирующий графический интерфейс клиентского приложения
@@ -39,6 +41,7 @@ public class ViewGuiClient extends JFrame {
         frame.pack();
         frame.setLocationRelativeTo(null); // при запуске отображает окно по центру экрана
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        client = new Client(this);
         //класс обработки события при закрытии окна приложения Сервера
         frame.addWindowListener(new WindowAdapter() {
             @Override
