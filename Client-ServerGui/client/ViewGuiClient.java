@@ -1,9 +1,5 @@
 package client;
 
-import server.ViewGuiServer;
-import src.client.Client;
-import src.client.ClientView;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,7 +8,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Set;
 
-public class ViewGuiClient extends JFrame {
+public class ViewGuiClient extends JFrame implements IClient{
     private Client client;
     private JFrame frame = new JFrame("Чат");
     private JTextArea messages = new JTextArea(30, 20);
@@ -25,7 +21,6 @@ public class ViewGuiClient extends JFrame {
     public ViewGuiClient() {
         initFrameClient();
         setVisible(true);
-        //this.client = client;
     }
 
     //метод, инициализирующий графический интерфейс клиентского приложения
@@ -72,14 +67,21 @@ public class ViewGuiClient extends JFrame {
                 textField.setText("");
             }
         });
+        while (true) {
+            if (client.isConnect()) {
+                client.nameUserRegistration();
+                client.receiveMessageFromServer();
+                client.setConnect(false);
+            }
+        }
     }
 
-    protected void addMessage(String text) {
+    public void addMessage(String text) {
         messages.append(text);
     }
 
     //метод обновляющий список имен подключившихся пользователей
-    protected void refreshListUsers(Set<String> listUsers) {
+    public void refreshListUsers(Set<String> listUsers) {
         users.setText("");
         if (client.isConnect()) {
             StringBuilder text = new StringBuilder("Список пользователей:\n");
@@ -91,7 +93,7 @@ public class ViewGuiClient extends JFrame {
     }
 
     //вызывает окно для ввода адреса сервера
-    protected String getServerAddressFromOptionPane() {
+    public String getServerAddressFromOptionPane() {
         while (true) {
             String addressServer = JOptionPane.showInputDialog(
                     frame, "Введите адрес сервера:",
@@ -103,7 +105,7 @@ public class ViewGuiClient extends JFrame {
     }
 
     //вызывает окно для ввода порта сервера
-    protected int getPortServerFromOptionPane() {
+    public int getPortServerFromOptionPane() {
         while (true) {
             String port = JOptionPane.showInputDialog(
                     frame, "Введите порт сервера:",
@@ -122,7 +124,7 @@ public class ViewGuiClient extends JFrame {
     }
 
     //вызывает окно для ввода имени пользователя
-    protected String getNameUser() {
+    public String getNameUser() {
         return JOptionPane.showInputDialog(
                 frame, "Введите имя пользователя:",
                 "Ввод имени пользователя",
@@ -131,7 +133,7 @@ public class ViewGuiClient extends JFrame {
     }
 
     //вызывает окно ошибки с заданным текстом
-    protected void errorDialogWindow(String text) {
+    public void errorDialogWindow(String text) {
         JOptionPane.showMessageDialog(
                 frame, text,
                 "Ошибка", JOptionPane.ERROR_MESSAGE

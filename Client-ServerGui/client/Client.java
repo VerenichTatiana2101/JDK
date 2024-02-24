@@ -4,16 +4,14 @@ import messages.Connection;
 import messages.Message;
 import messages.MessageType;
 
-
 import java.io.IOException;
 import java.net.Socket;
 
-public class Client {
+public class Client{
     private Connection connection;
-    private static ModelGuiClient model;
+    private ModelGuiClient model;
     private IClient iClient;
-    // нужно избавиться
-   // private static ViewGuiClient gui;
+
     private volatile boolean isConnect = false; //состояние подключения клиента к серверу
 
     public boolean isConnect() {
@@ -24,27 +22,10 @@ public class Client {
         isConnect = connect;
     }
 
-    public Client() {
+    public Client(IClient iClient) {
         this.iClient = iClient;
+        this.model = new ModelGuiClient();
     }
-
-    //точка входа в клиентское приложение
-    public static void main(String[] args) {
-        Client client = new Client();
-        model = new ModelGuiClient();
-        ViewGuiClient gui = new ViewGuiClient();
-        gui.initFrameClient();
-        while (true) {
-            if (client.isConnect()) {
-                client.nameUserRegistration();
-                client.receiveMessageFromServer();
-                client.setConnect(false);
-            }
-        }
-
-
-    }
-
 
     //подключение клиента к серверу
     protected void connectToServer() {
@@ -160,7 +141,7 @@ public class Client {
 
     // метод позволяет показывать изображение
     private void errorDialogWindow(String text) {
-        iClient.showOnWindow(text + "\n");
+        iClient.errorDialogWindow(text + "\n");
     }
 
 }
