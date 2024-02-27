@@ -3,27 +3,26 @@ import java.util.concurrent.CountDownLatch;
 
 
 public class Philosopher extends Thread {
-
-    private String name;
-    private int philosopherNum;
-    private static int nextPhilosopherNumber = 1;
-    private int lefFork;
-    private int rightFork;
+    private final String name;
+    private static int nextPhilosopherNumber = 0;
+    private final int leftFork, rightFork;
     private int countEat;
     private boolean eats;
     private boolean hungry;
     private CountDownLatch cdl;
+    private DinnerRoom dinnerRoom;
 
-    public Philosopher(String name, CountDownLatch cdl) {
+    public Philosopher(String name, CountDownLatch cdl, DinnerRoom dinnerRoom, int rightFork) {
         this.name = name;
-        this.philosopherNum = nextPhilosopherNumber;
+        int philosopherNum = nextPhilosopherNumber;
         nextPhilosopherNumber++;
-        this.lefFork = philosopherNum;
-        this.rightFork = philosopherNum + 1;
+        this.leftFork = philosopherNum;
+        this.rightFork = rightFork;
         this.countEat = 0;
         this.eats = false;
         this.hungry = true;
-        this.cdl= cdl;
+        this.cdl = cdl;
+        this.dinnerRoom = dinnerRoom;
     }
 
     @Override
@@ -31,35 +30,49 @@ public class Philosopher extends Thread {
         try {
             goToStart();
             cdl.await();
+            System.out.println("Кто успел, тот и съел, поехали!!!");
+            for (int i = 0; i <= 3; i++) {
+                eat();
+                System.out.println(getName() + " поел " + i + " раз ");
+            }
+            setHungry(false);
+            System.out.println(getName() + " Закончили трапезу!");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     private void goToStart() throws InterruptedException {
-        System.out.println(name +" - Идет в столовую");
+        System.out.println(name + " - Идет в столовую");
         Thread.sleep(1000 + new Random().nextInt(2000));
         System.out.println(name + " - Пришел в столовую");
         cdl.countDown();
     }
 
-    void eat(Philosopher philosopher, Fork[] forks) {
-        if(countEat<3){
-            if(!forks[lefFork].isUsed() && !forks[rightFork].isUsed()){
-                forks[lefFork].setUsed(true);
-                forks[rightFork].setUsed(true);
-                philosopher.setEats(true);
-                System.out.println(philosopher.getName() + " приступил к еде, в левой руке вилка "
-                + lefFork + " в правой " + rightFork);
-                setCountEat(countEat+1);
-                System.out.println(philosopher.getName() + " поел " + countEat + " раз ");
+    void eat() throws InterruptedException {
+        //if(countEat<3){
+        if (dinnerRoom.freeForks(leftFork, rightFork)) {
+            setEats(true);
+            System.out.println(getName() + " приступил к еде, в левой руке вилка "
+                    + leftFork + " в правой " + rightFork);
+            wait(200);
+            //setCountEat(countEat+1);
+            //System.out.println(philosopher.getName() + " поел " + countEat + " раз ");
+                /*
                 if (countEat == 3){
                     setHungry(false);
                     System.out.println(philosopher.getName() + " Закончил трапезу!");
-                }
-            }
-            // в противном случае ждем
+                }*/
         }
+        // в противном случае ждем
+        else {
+            try {
+                wait(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        // }
     }
 
     public void setEats(boolean eats) {
@@ -78,11 +91,14 @@ public class Philosopher extends Thread {
         this.cdl = cdl;
     }
 
+    public String getPhilosopherName() {
+        return name;
+    }
+
     @Override
     public String toString() {
-        return "\nФилософ" +
-                " №=" + philosopherNum +
-                ", вилка слева=" + lefFork +
+        return "\n" + getName() +
+                ", вилка слева=" + leftFork +
                 ", вилка справа=" + rightFork +
                 ", поел раз=" + countEat +
                 ", кушает=" + eats +
