@@ -1,6 +1,6 @@
 public class Fork {
-    private boolean used;
-    private static int nextForkNumber = 1;
+    private volatile boolean used;
+    private static int nextForkNumber = 0;
     private int num;
 
     public Fork(boolean used) {
@@ -16,13 +16,8 @@ public class Fork {
     public boolean isUsed() {
         return used;
     }
-
     public void setUsed(boolean used) {
         this.used = used;
-    }
-
-    public void setNum(int num) {
-        this.num = num;
     }
 
     @Override
