@@ -10,9 +10,8 @@ public class Philosopher extends Thread {
     private boolean hungry;
     private CountDownLatch cdl;
     private DinnerRoom dinnerRoom;
-    Semaphore semaphore = new Semaphore(2);
 
-    public Philosopher(String name, CountDownLatch cdl, DinnerRoom dinnerRoom, int rightFork) {
+    public Philosopher(String name,CountDownLatch cdl, DinnerRoom dinnerRoom, int rightFork) {
         this.name = name;
         int philosopherNum = nextPhilosopherNumber;
         nextPhilosopherNumber++;
@@ -41,27 +40,22 @@ public class Philosopher extends Thread {
     }
 
     private void goToStart() throws InterruptedException {
-        sleep(500 + new Random().nextInt(2000));
         System.out.println(name + " - Пришел в столовую");
         cdl.countDown();
     }
 
     void eat() throws InterruptedException {
-        try {
-            semaphore.acquire();
-            if (dinnerRoom.freeForks(leftFork, rightFork)) {
-                sleep(500 + new Random().nextInt(2000));
-                System.out.println(getPhilosopherName() + " приступил к еде, в левой руке вилка "
-                        + leftFork + " в правой " + rightFork);
-                countEat++;
-                System.out.println(getPhilosopherName() + " поел " + countEat + " раз ");
-                dinnerRoom.think(leftFork, rightFork);
-                if (countEat == 3) {
-                    setHungry(false);
-                }
+        if (dinnerRoom.freeForks(leftFork, rightFork)) {
+            sleep(500 + new Random().nextInt(2000));
+            System.out.println(getPhilosopherName() + " приступил к еде, в левой руке вилка "
+                    + leftFork + " в правой " + rightFork);
+            countEat++;
+            System.out.println(getPhilosopherName() + " поел " + countEat + " раз ");
+            dinnerRoom.think(leftFork, rightFork);
+            if (countEat == 3) {
+                setHungry(false);
             }
-        } finally {
-            semaphore.release();
+
         }
     }
 

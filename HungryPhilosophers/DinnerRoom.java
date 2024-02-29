@@ -1,10 +1,10 @@
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DinnerRoom implements Runnable {
-
     Philosopher[] philosophers = new Philosopher[5];
     private final CountDownLatch cdl = new CountDownLatch(philosophers.length);
     Fork[] forks = new Fork[philosophers.length];
@@ -39,7 +39,7 @@ public class DinnerRoom implements Runnable {
         //System.out.println(Arrays.toString(philosophers));
     }
 
-    boolean freeForks(int left, int right) {
+    synchronized boolean freeForks(int left, int right) {
         if (!forks[left].isUsed() && !forks[right].isUsed()) {
             forks[left].setUsed(true);
             forks[right].setUsed(true);
@@ -53,6 +53,6 @@ public class DinnerRoom implements Runnable {
         forks[left].setUsed(false);
         forks[right].setUsed(false);
         System.out.println("Вилки " + left + " и " + right + " свободны");
-        Thread.sleep(500);
+        Thread.sleep(100);
     }
 }
