@@ -1,4 +1,5 @@
 package org.example;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -9,49 +10,93 @@ import java.util.Random;
  * для того, чтобы убедиться в верности парадокса Монте Холла
  */
 public class Paradox {
-    Leading leading = new Leading();
+
+    private final Leading leading = new Leading();
     Random rand = new Random();
-    Door[] doors;
-    Map<String, String> resulStrings = new HashMap<>();
-    String result;
-    int inCommand;
-    int secondCh;
+    private Door[] doors;
+    private Map<Integer, String> resultStrings = new HashMap<>();
+    private Door result;
+    private int firstChoice;
+    private int secondChoice;
+    private final int COUNT_ITERATIONS = 1000;
 
-    void oho(){
-        for (int i = 0; i < 1000; i++) {
-            startGame();
+    Map<Integer, String> gameLoop() {
+        for (int i = 0; i <= COUNT_ITERATIONS; i++) {
+            resultStrings.put(i, startGame());
         }
-        for (int i = 0; i < resulStrings.size(); i++) {
-            System.out.println(i);
-        }
-
+        return resultStrings;
     }
 
-    void startGame() {
+    String startGame() {
         leading.initPlay();
         leading.initPutPresent();
-        inCommand = firstChoice();
-        doors = leading.openDoor(inCommand);
-        secondCh = secondChoice(inCommand);
-        result = leading.checkTheResults(doors, secondCh);
-        addToFile(inCommand, secondCh, result, resulStrings);
+        firstChoice = firstChoice();
+        doors = leading.openDoor(firstChoice);
+        secondChoice = secondChoice();
+        result = leading.checkTheResults(doors, secondChoice);
+        return addToFile(firstChoice, secondChoice, result);
     }
 
     int firstChoice() {
-        int n = rand.nextInt(3);
-        n += 1;
-        return n;
+        return rand.nextInt(1, 3);
     }
 
-    int secondChoice(int choice) {
-        choice = rand.nextInt(2);
-        return choice;
+    int secondChoice() {
+        return rand.nextInt(2);
     }
 
-    Map<String, String> addToFile(int first, int second, String res, Map<String, String> resultMap){
+    String addToFile(int first, int second, Door res) {
+        if (first != second) {
+            if (res.isPresent()) return ("Игрок менял выбор, результат - WON " + second + "\n");
+            else return ("Игрок менял выбор, результат - LOST " + second + "\n");
+        } else {
+            if (res.isPresent()) return ("Игрок не менял выбор, результат - LOST " + second + "\n");
+            else return ("Игрок не менял выбор, результат - WON " + second + "\n");
+        }
+    }
 
-        if(first != second)resultMap.put("Игрок менял выбор, результат - ", res);
-        else resultMap.put("Игрок не менял выбор, результат - ", res);
-        return resultMap;
+    String calculateStatistics() {
+        Map<Integer, String> gameResult = gameLoop();
+        int totalGames = gameResult.size();
+
+        int wonGames = 0;
+        int lostGames = 0;
+
+        int changedChoiceWonGames = 0;
+        int changedChoiceLostGames = 0;
+        int unchangedChoiceWonGames = 0;
+        int unchangedChoiceLostGames = 0;
+
+        for (String result : gameResult.values()) {
+            if (result.contains("WON") && result.contains("1")) {
+                changedChoiceWonGames++;
+                wonGames++;
+            } else if (result.contains("LOST") && result.contains("1")) {
+                changedChoiceLostGames++;
+                lostGames++;
+            } else if (result.contains("WON") && result.contains("0")) {
+                unchangedChoiceWonGames++;
+                wonGames++;
+            } else if (result.contains("LOST") && result.contains("0")) {
+                unchangedChoiceLostGames++;
+                lostGames++;
+            }
+        }
+
+        double winPercentage = (double) wonGames / totalGames * 100;
+        double lostPercentage = (double) lostGames / totalGames * 100;
+
+        double changedChoiceWinPercentage = (double) changedChoiceWonGames
+                / (changedChoiceWonGames + changedChoiceLostGames) * 100;
+        double unchangedChoiceWinPercentage = (double) unchangedChoiceWonGames
+                / (unchangedChoiceWonGames + unchangedChoiceLostGames) * 100;
+
+        return String.format("Общий процент выигрышей: %.2f%%\n" +
+                        "Общий процент проигрышей: %.2f%%\n" +
+                        "Процент выигрышей при изменении выбора: %.2f%%\n" +
+                        "Процент выигрышей при неизменном выборе: %.2f%%\n",
+                winPercentage, lostPercentage, changedChoiceWinPercentage, unchangedChoiceWinPercentage);
     }
 }
+
+

@@ -57,9 +57,9 @@ public class Leading {
      * @param inCommand решение пользователя менять или не менять свой выбор
      * @return Метод возвращает дверь результата игры в виде строки
      */
-    String checkTheResults(Door[] arr, int inCommand) {
-        if(inCommand == 0) return arr[0].toString();
-        else return arr[1].toString();
+    Door checkTheResults(Door[] arr, int inCommand) {
+        if(inCommand == 0) return arr[0];
+        else return arr[1];
     }
 
 
